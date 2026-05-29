@@ -1,0 +1,47 @@
+[
+  {
+    "id": "e3165be5",
+    "lat": 17.491120557376252,
+    "lon": 78.45401742351063,
+    "type": "accident",
+    "description": "User reported accident",
+    "timestamp": "2026-05-28T23:29:47.540590Z",
+    "upvotes": 0
+  },
+  {
+    "id": "8d855b65",
+    "lat": 17.491095392995437,
+    "lon": 78.45402061573542,
+    "type": "accident",
+    "description": "User reported accident",
+    "timestamp": "2026-05-29T05:29:55.862982Z",
+    "upvotes": 0
+  },
+  {
+    "id": "e2498114",
+    "lat": 17.491147504409096,
+    "lon": 78.45399801846787,
+    "type": "accident",
+    "description": "Nearest hospital: Alavi Hospital (0.33 km, \ud83d\udcde N/A)",
+    "timestamp": "2026-05-29T11:55:48.434480Z",
+    "upvotes": 0
+  },
+  {
+    "id": "115517b7",
+    "lat": 17.4911402855127,
+    "lon": 78.45402516650987,
+    "type": "accident",
+    "description": "Nearest hospital: Alavi Hospital (0.33 km, \ud83d\udcde N/A)",
+    "timestamp": "2026-05-29T12:15:22.358826Z",
+    "upvotes": 0
+  },
+  {
+    "id": "74d30c65",
+    "lat": 17.491131862824357,
+    "lon": 78.45400496852682,
+    "type": "accident",
+    "description": "Accident | Nearest hospital: Alavi Hospital (0.33 km, \ud83d\udcde N/A)",
+    "timestamp": "2026-05-29T16:54:45.281484Z",
+    "upvotes": 0
+  }
+]

@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>RoadSoS – Emergency Response</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&family=Share+Tech+Mono&family=Exo+2:wght@300;400;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/style.css"/>
+</head>
+<body>
+
+<!-- ═══════════ HOME PAGE ═══════════ -->
+<div id="home-page">
+  <div class="home-bg">
+    <div class="home-grid"></div>
+    <div class="home-glow"></div>
+    <div class="home-orbit"></div>
+  </div>
+  <div class="home-content">
+    <div class="home-logo-wrap">
+      <div class="home-ring"></div>
+      <div class="home-ring"></div>
+      <div class="home-ring"></div>
+      <svg class="home-hex-svg" viewBox="0 0 100 115">
+        <defs>
+          <linearGradient id="hexGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%"   stop-color="#0ea5e9"/>
+            <stop offset="100%" stop-color="#14b8a6"/>
+          </linearGradient>
+        </defs>
+        <polygon points="50,5 95,30 95,85 50,110 5,85 5,30"
+          fill="none" stroke="url(#hexGrad)" stroke-width="2.5"/>
+        <text x="50" y="68" text-anchor="middle" fill="url(#hexGrad)"
+          font-size="26" font-family="Rajdhani" font-weight="700">RS</text>
+      </svg>
+    </div>
+
+    <h1 class="home-title">ROAD<span>SoS</span></h1>
+    <p class="home-subtitle">EMERGENCY RESPONSE SYSTEM</p>
+    <p class="home-quote">"When every second matters, we find help first."</p>
+
+    <button id="btn-enter" class="home-enter-btn">LAUNCH SYSTEM</button>
+
+    <p class="home-note">
+      Works offline &nbsp;·&nbsp; Global OSM coverage &nbsp;·&nbsp; No signup required
+    </p>
+  </div>
+</div>
+
+<!-- ═══════════ REPORTS OVERLAY ═══════════ -->
+<div id="reports-overlay" class="reports-overlay hidden">
+  <div class="reports-page">
+    <div class="reports-header">
+      <div class="reports-title">📋 INCIDENT REPORTS</div>
+      <button id="reports-close" class="reports-close-btn">✕ CLOSE</button>
+    </div>
+    <div id="reports-content" class="reports-content">
+      <div class="reports-loading">Loading reports...</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ MAIN APP ═══════════ -->
+<div id="app-page" class="hidden">
+
+  <!-- SOS OVERLAY -->
+  <div id="sos-overlay" class="sos-overlay hidden">
+    <div class="sos-modal">
+      <div class="sos-pulse-ring"></div>
+      <div class="sos-pulse-ring delay1"></div>
+      <div class="sos-pulse-ring delay2"></div>
+      <div class="sos-icon">🆘</div>
+      <h2>EMERGENCY SOS</h2>
+      <p id="sos-status">Locating your position...</p>
+      <div id="sos-contacts"></div>
+      <button id="sos-cancel" class="sos-cancel-btn">CLOSE</button>
+    </div>
+  </div>
+
+  <!-- OFFLINE BANNER -->
+  <div id="offline-banner" class="offline-banner hidden">
+    ⚡ OFFLINE MODE — Using cached local data. Core features still active.
+  </div>
+
+  <!-- HEADER -->
+  <header>
+    <div class="logo">
+      <svg viewBox="0 0 40 46" width="32">
+        <defs>
+          <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%"   stop-color="#0ea5e9"/>
+            <stop offset="100%" stop-color="#14b8a6"/>
+          </linearGradient>
+        </defs>
+        <polygon points="20,2 38,12 38,34 20,44 2,34 2,12"
+          fill="none" stroke="url(#logoGrad)" stroke-width="2.5"/>
+        <text x="20" y="30" text-anchor="middle" fill="url(#logoGrad)"
+          font-size="14" font-family="Rajdhani" font-weight="700">RS</text>
+      </svg>
+      <div class="logo-text-wrap">
+        <span class="logo-main">ROAD<span class="logo-accent">SoS</span></span>
+        <span class="logo-sub">EMERGENCY RESPONSE SYSTEM</span>
+      </div>
+    </div>
+
+    <div class="header-center">
+      <div class="stat-pill">
+        <span class="stat-num" id="cnt-total">0</span>
+        <span class="stat-label">CONTACTS</span>
+      </div>
+      <div class="stat-pill">
+        <span class="stat-num" id="cnt-online">–</span>
+        <span class="stat-label">STATUS</span>
+      </div>
+      <div class="stat-pill">
+        <span class="stat-num" id="cnt-reports">0</span>
+        <span class="stat-label">REPORTS</span>
+      </div>
+    </div>
+
+    <div class="header-right">
+      <button id="btn-open-reports" class="header-reports-btn">
+        📋 REPORTS
+      </button>
+      <div class="signal-bars" id="signal-bars">
+        <span></span><span></span><span></span><span></span>
+      </div>
+      <button id="sos-trigger" class="sos-btn">
+        <span class="sos-btn-inner">SOS</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- MAIN LAYOUT -->
+  <main>
+
+    <!-- LEFT SIDEBAR -->
+    <aside class="sidebar">
+
+      <!-- MY LOCATION -->
+      <div class="s-card">
+        <div class="s-card-header">
+          <span class="s-card-icon">◎</span>
+          <span class="s-card-title">MY LOCATION</span>
+          <span class="s-card-badge" id="loc-badge">NOT SET</span>
+        </div>
+        <button id="btn-locate" class="action-btn btn-blue">⊕ AUTO-DETECT</button>
+        <div class="coord-grid">
+          <div class="coord-field">
+            <label>LAT</label>
+            <input id="inp-lat" type="number" step="0.0001" placeholder="–"/>
+          </div>
+          <div class="coord-field">
+            <label>LON</label>
+            <input id="inp-lon" type="number" step="0.0001" placeholder="–"/>
+          </div>
+        </div>
+        <button id="btn-use-manual" class="action-btn btn-ghost">
+          USE MANUAL COORDS
+        </button>
+      </div>
+
+      <!-- FIND SERVICES -->
+      <div class="s-card">
+        <div class="s-card-header">
+          <span class="s-card-icon">⊞</span>
+          <span class="s-card-title">FIND SERVICES</span>
+          <span class="s-card-badge" id="svc-badge">OSM LIVE</span>
+        </div>
+        <div class="filter-chips" id="filter-chips">
+          <button class="chip chip-active" data-type="all">ALL</button>
+          <button class="chip" data-type="hospital"  title="Hospitals">🏥</button>
+          <button class="chip" data-type="police"    title="Police">👮</button>
+          <button class="chip" data-type="ambulance" title="Ambulance">🚑</button>
+          <button class="chip" data-type="towing"    title="Towing">🚛</button>
+          <button class="chip" data-type="puncture"  title="Puncture">🔧</button>
+          <button class="chip" data-type="showroom"  title="Showroom">🏪</button>
+        </div>
+        <button id="btn-services" class="action-btn btn-green">
+          ⌖ SEARCH NEARBY
+        </button>
+        <div class="svc-hint">
+          💡 Double-tap any result to set as destination
+        </div>
+        <div id="services-list"></div>
+      </div>
+
+      <!-- DESTINATION -->
+      <div class="s-card">
+        <div class="s-card-header">
+          <span class="s-card-icon">⊗</span>
+          <span class="s-card-title">DESTINATION</span>
+          <span class="s-card-badge" id="dest-badge">NOT SET</span>
+        </div>
+        <div id="dest-selected-name" class="dest-selected-name hidden"></div>
+        <div class="coord-grid">
+          <div class="coord-field">
+            <label>LAT</label>
+            <input id="dest-lat" type="number" step="0.0001" placeholder="Double-tap a service ↑"/>
+          </div>
+          <div class="coord-field">
+            <label>LON</label>
+            <input id="dest-lon" type="number" step="0.0001" placeholder="or enter manually"/>
+          </div>
+        </div>
+
+        <!-- Road type — auto-detected, user can override -->
+        <div class="road-select-wrap">
+          <label>ROAD TYPE <span class="label-auto">(auto-detected)</span></label>
+          <select id="road-type">
+            <option value="urban">🏙 Urban — City / town roads</option>
+            <option value="highway">🛣 Highway — NH / SH, long distance</option>
+            <option value="rural">🌾 Rural — Village / outskirt roads</option>
+          </select>
+          <div id="road-type-info" class="road-type-info">
+            Set a destination to auto-detect road type
+          </div>
+        </div>
+
+        <button id="btn-route" class="action-btn btn-red">
+          ⟶ COMPUTE ROUTES
+        </button>
+      </div>
+
+      <!-- REPORT INCIDENT -->
+      <div class="s-card">
+        <div class="s-card-header">
+          <span class="s-card-icon">⚑</span>
+          <span class="s-card-title">REPORT INCIDENT</span>
+        </div>
+        <div class="report-type-grid">
+          <button class="report-type-btn active" data-rtype="accident">
+            💥<span>Accident</span>
+          </button>
+          <button class="report-type-btn" data-rtype="roadblock">
+            🚧<span>Roadblock</span>
+          </button>
+          <button class="report-type-btn" data-rtype="hazard">
+            ⚠️<span>Hazard</span>
+          </button>
+        </div>
+        <input id="report-desc" class="text-inp" type="text"
+          placeholder="What happened? (optional)"/>
+        <button id="btn-report" class="action-btn btn-warn">
+          ⚑ SUBMIT REPORT
+        </button>
+        <div id="report-feedback" class="feedback-msg"></div>
+      </div>
+      <!-- OFFLINE EMERGENCY KIT -->
+      <div class="s-card hidden" id="offline-kit-card">
+        <div class="s-card-header">
+          <span class="s-card-icon">📦</span>
+          <span class="s-card-title">OFFLINE EMERGENCY KIT</span>
+          <span class="s-card-badge" style="color:#10b981;border-color:#10b981">ALWAYS ON</span>
+        </div>
+        <div class="kit-desc">
+          Works without internet. Tap any number to call instantly.
+        </div>
+        <div class="kit-numbers">
+          <a href="tel:112" class="kit-num">
+            <span class="kit-emoji">🆘</span>
+            <div class="kit-info">
+              <div class="kit-name">National Emergency</div>
+              <div class="kit-phone">112</div>
+            </div>
+            <span class="kit-call">CALL</span>
+          </a>
+          <a href="tel:108" class="kit-num">
+            <span class="kit-emoji">🚑</span>
+            <div class="kit-info">
+              <div class="kit-name">Ambulance</div>
+              <div class="kit-phone">108</div>
+            </div>
+            <span class="kit-call">CALL</span>
+          </a>
+          <a href="tel:100" class="kit-num">
+            <span class="kit-emoji">👮</span>
+            <div class="kit-info">
+              <div class="kit-name">Police</div>
+              <div class="kit-phone">100</div>
+            </div>
+            <span class="kit-call">CALL</span>
+          </a>
+          <a href="tel:101" class="kit-num">
+            <span class="kit-emoji">🚒</span>
+            <div class="kit-info">
+              <div class="kit-name">Fire</div>
+              <div class="kit-phone">101</div>
+            </div>
+            <span class="kit-call">CALL</span>
+          </a>
+          <a href="tel:1073" class="kit-num">
+            <span class="kit-emoji">🛣</span>
+            <div class="kit-info">
+              <div class="kit-name">Road Accident Helpline</div>
+              <div class="kit-phone">1073</div>
+            </div>
+            <span class="kit-call">CALL</span>
+          </a>
+          <a href="tel:1800114000" class="kit-num">
+            <span class="kit-emoji">🏥</span>
+            <div class="kit-info">
+              <div class="kit-name">Health Helpline</div>
+              <div class="kit-phone">1800-114-000</div>
+            </div>
+            <span class="kit-call">CALL</span>
+          </a>
+        </div>
+        <div id="kit-cached-hospital" class="kit-cached hidden">
+          <div class="kit-cached-title">📍 Nearest Cached Hospital</div>
+          <div id="kit-hospital-name" class="kit-cached-name">–</div>
+          <div id="kit-hospital-dist" class="kit-cached-dist">–</div>
+          <a id="kit-hospital-phone" href="tel:" class="kit-cached-call">📞 TAP TO CALL</a>
+        </div>
+      </div>
+
+    </aside>
+
+    <!-- MAP -->
+    <div id="map-wrap">
+      <div id="map"></div>
+
+      <!-- Risk score overlay -->
+      <div id="risk-overlay" class="map-overlay-card hidden">
+        <div class="risk-header">ROAD RISK SCORE</div>
+        <div class="risk-gauge-wrap">
+          <svg class="risk-gauge" viewBox="0 0 120 70">
+            <path d="M10,65 A55,55 0 0,1 110,65"
+              fill="none" stroke="#0d1f30"
+              stroke-width="12" stroke-linecap="round"/>
+            <path id="risk-arc"
+              d="M10,65 A55,55 0 0,1 110,65"
+              fill="none" stroke="#10b981"
+              stroke-width="12" stroke-linecap="round"
+              stroke-dasharray="173" stroke-dashoffset="173"/>
+            <text id="risk-num-svg" x="60" y="58"
+              text-anchor="middle" fill="#e2e8f0"
+              font-size="22" font-family="Rajdhani" font-weight="700">–</text>
+          </svg>
+        </div>
+        <div id="risk-level-badge" class="risk-level-badge">–</div>
+        <div id="risk-factors-mini"></div>
+      </div>
+
+      <!-- Route legend -->
+      <div id="route-legend" class="map-overlay-card hidden"
+        style="bottom:16px;left:16px;right:auto;min-width:auto;padding:8px 14px;">
+        <div class="legend-row">
+          <span class="legend-line fastest-line"></span>
+          <span>Fastest Route</span>
+        </div>
+        <div class="legend-row">
+          <span class="legend-line safest-line"></span>
+          <span>Safest Route</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT PANEL -->
+    <aside class="route-panel hidden" id="route-panel">
+      <div class="route-panel-header">ROUTE ANALYSIS</div>
+      <div id="route-cards-wrap"></div>
+      <div class="compare-table hidden" id="compare-table">
+        <div class="compare-header">COMPARISON</div>
+        <table>
+          <tr>
+            <th></th>
+            <th style="color:#f59e0b">⚡ FAST</th>
+            <th style="color:#10b981">🛡 SAFE</th>
+          </tr>
+          <tr><td>Time</td><td id="cmp-f-time">–</td><td id="cmp-s-time">–</td></tr>
+          <tr><td>Dist</td><td id="cmp-f-dist">–</td><td id="cmp-s-dist">–</td></tr>
+          <tr><td>Risk</td><td id="cmp-f-risk">–</td><td id="cmp-s-risk">–</td></tr>
+          <tr>
+            <td colspan="3" id="cmp-verdict"
+              style="text-align:center;padding:7px 8px">–</td>
+          </tr>
+        </table>
+      </div>
+    </aside>
+
+  </main>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="/static/js/map.js"></script>
+<script src="/static/js/app.js"></script>
+</body>
+</html>

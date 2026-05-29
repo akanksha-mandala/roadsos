@@ -1,0 +1,47 @@
+[
+  {
+    "id": "ACC001",
+    "lat": 17.3850,
+    "lon": 78.4867,
+    "road_type": "highway",
+    "severity": 3,
+    "timestamp": "2025-01-15T08:30:00",
+    "description": "Multi-vehicle collision near flyover"
+  },
+  {
+    "id": "ACC002",
+    "lat": 17.3950,
+    "lon": 78.4767,
+    "road_type": "urban",
+    "severity": 2,
+    "timestamp": "2025-01-20T17:45:00",
+    "description": "Rear-end collision at signal"
+  },
+  {
+    "id": "ACC003",
+    "lat": 17.3750,
+    "lon": 78.4967,
+    "road_type": "rural",
+    "severity": 4,
+    "timestamp": "2025-01-22T23:15:00",
+    "description": "Head-on collision on dark road"
+  },
+  {
+    "id": "ACC004",
+    "lat": 17.3900,
+    "lon": 78.4800,
+    "road_type": "urban",
+    "severity": 1,
+    "timestamp": "2025-02-01T14:20:00",
+    "description": "Minor fender bender at intersection"
+  },
+  {
+    "id": "ACC005",
+    "lat": 17.3820,
+    "lon": 78.4920,
+    "road_type": "highway",
+    "severity": 5,
+    "timestamp": "2025-02-10T03:40:00",
+    "description": "Fatal accident due to overspeeding"
+  }
+]
